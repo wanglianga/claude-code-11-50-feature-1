@@ -10,6 +10,8 @@ import com.portops.lakehouse.commit.LakeCommit;
 import com.portops.lakehouse.commit.LakeCommitRepository;
 import com.portops.lakehouse.ingest.IngestEvent;
 import com.portops.lakehouse.ingest.IngestEventRepository;
+import com.portops.lakehouse.semantic.SemanticQueryService;
+import com.portops.lakehouse.semantic.SemanticCompileService;
 import com.portops.lakehouse.settlement.FeeSchedule;
 import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
@@ -45,17 +47,23 @@ public class ManifestService {
     private final VoyageBookingRepository bookingRepo;
     private final LakeCommitRepository commitRepo;
     private final IngestEventRepository eventRepo;
+    private final SemanticQueryService semanticQueryService;
+    private final SemanticCompileService semanticCompileService;
     private final EntityManager em;
     private final ObjectMapper om;
 
     public ManifestService(VoyageManifestRepository manifestRepo, ManifestItemRepository itemRepo,
                            VoyageBookingRepository bookingRepo, LakeCommitRepository commitRepo,
-                           IngestEventRepository eventRepo, EntityManager em, ObjectMapper om) {
+                           IngestEventRepository eventRepo, SemanticQueryService semanticQueryService,
+                           SemanticCompileService semanticCompileService,
+                           EntityManager em, ObjectMapper om) {
         this.manifestRepo = manifestRepo;
         this.itemRepo = itemRepo;
         this.bookingRepo = bookingRepo;
         this.commitRepo = commitRepo;
         this.eventRepo = eventRepo;
+        this.semanticQueryService = semanticQueryService;
+        this.semanticCompileService = semanticCompileService;
         this.em = em;
         this.om = om;
     }
@@ -163,6 +171,20 @@ public class ManifestService {
             throw BizException.conflict("清单冻结失败，提交边界不完整: " + String.join("; ", blockers));
         }
 
+        // 语义层前置校验：存在 HIGH 级语义冲突（不可能状态未裁定）时不得冻结，
+        // 冲突作业本来就被阻止进入可收费汇总，不能带着冲突发布航次快照
+        List<String> bookingContainers = bookings.stream().map(VoyageBooking::getContainerNo).toList();
+        // 冻结流程内确保每个订舱箱都有语义解释版本（语义状态仍独立保存，不与费用快照混写）
+        semanticCompileService.ensureCompiled(bookingContainers, operator);
+        List<com.portops.lakehouse.semantic.SemanticConflict> semanticBlockers =
+                semanticQueryService.blockingConflicts(bookingContainers);
+        if (!semanticBlockers.isEmpty()) {
+            String detail = semanticBlockers.stream()
+                    .map(c -> c.getContainerNo() + ":" + c.getConflictType())
+                    .reduce((a, b) -> a + ", " + b).orElse("");
+            throw BizException.conflict("清单冻结失败，存在待裁定的语义冲突事实: " + detail);
+        }
+
         VoyageManifest m = new VoyageManifest();
         m.setVoyageNo(voyageNo);
         m.setCutoffTime(cutoffTime);
@@ -176,6 +198,10 @@ public class ManifestService {
         }
         itemRepo.saveAll(items);
 
+        // 航次作业快照：冻结时刻把语义解释版本边界独立固化（与费用快照分开保存，互不覆盖）
+        Map<String, Object> jobSnapshot = semanticQueryService.freezeSnapshot(
+                saved.getId(), voyageNo, bookingContainers);
+
         log.info("manifest frozen: voyage={} id={} items={} frontier={}", voyageNo, saved.getId(), items.size(), frontier);
         Map<String, Object> r = new LinkedHashMap<>();
         r.put("manifestId", saved.getId());
@@ -184,6 +210,7 @@ public class ManifestService {
         r.put("status", saved.getStatus());
         r.put("itemCount", items.size());
         r.put("commitFrontier", frontier);
+        r.put("jobSnapshot", jobSnapshot);
         return r;
     }
 

@@ -1,0 +1,3 @@
+[
+  {"sourceSystem": "CRANE", "sourceSeq": 164, "containerNo": "SEM008", "opPartition": "YARD-A", "eventType": "CRANE_MOVE", "bizTime": "2026-11-21T16:00:00+08:00", "voyageNo": "V2026-11B", "payload": {"action": "HOIST", "fromBlock": "A", "fromSlot": "05-05", "toBlock": "A", "toSlot": "05-05", "crane": "QC-06", "note": "晚到的吊起报文，且没有落箱证据；不得把已证实落箱倒退为吊运中"}}
+]

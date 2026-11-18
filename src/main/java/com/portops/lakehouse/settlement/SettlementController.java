@@ -1,6 +1,7 @@
 package com.portops.lakehouse.settlement;
 
 import com.portops.lakehouse.common.BizException;
+import com.portops.lakehouse.semantic.SemanticQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +14,19 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/settlement")
-@Tag(name = "07-结算", description = "只能引用已冻结航次版本；调整单与原始结算分列")
+@Tag(name = "08-结算", description = "只能引用已冻结航次版本；调整单与原始结算分列；作业纳入/排除可追溯")
 public class SettlementController {
 
     private final SettlementService settlementService;
     private final FeeAdjustmentRepository adjustmentRepo;
+    private final SemanticQueryService semanticQueryService;
 
-    public SettlementController(SettlementService settlementService, FeeAdjustmentRepository adjustmentRepo) {
+    public SettlementController(SettlementService settlementService,
+                                FeeAdjustmentRepository adjustmentRepo,
+                                SemanticQueryService semanticQueryService) {
         this.settlementService = settlementService;
         this.adjustmentRepo = adjustmentRepo;
+        this.semanticQueryService = semanticQueryService;
     }
 
     @GetMapping("/manifests/{manifestId}/charges")
@@ -35,6 +40,13 @@ public class SettlementController {
     @Operation(summary = "费用调整单列表", description = "每张调整单的 basis 字段说明费用调整依据（清单行/提交/事件/差异）")
     public List<FeeAdjustment> adjustments(@PathVariable Long manifestId) {
         return adjustmentRepo.findByManifestIdOrderByCreatedAtAsc(manifestId);
+    }
+
+    @GetMapping("/manifests/{manifestId}/job-snapshot")
+    @Operation(summary = "航次作业快照（结算追溯）",
+            description = "冻结时刻固化的作业事实：每项作业的 chargeable 纳入标记、excludeReason 排除原因与 sourceEventIds 原始事件范围")
+    public Map<String, Object> jobSnapshot(@PathVariable Long manifestId) {
+        return semanticQueryService.snapshotDetail(manifestId);
     }
 
     @GetMapping("/quote")

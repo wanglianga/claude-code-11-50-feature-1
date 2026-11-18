@@ -23,7 +23,9 @@ public abstract class BaseIntegrationTest {
         jdbc.execute("""
                 TRUNCATE TABLE ingest_event, lake_commit, commit_conflict, voyage_booking,
                     voyage_manifest, manifest_item, revision_candidate, carrier_receipt,
-                    recon_run, recon_diff, fee_adjustment
+                    recon_run, recon_diff, fee_adjustment,
+                    semantic_compile_run, semantic_fact, semantic_conflict,
+                    manifest_job_snapshot, manifest_job_snapshot_item
                 RESTART IDENTITY CASCADE
                 """);
     }

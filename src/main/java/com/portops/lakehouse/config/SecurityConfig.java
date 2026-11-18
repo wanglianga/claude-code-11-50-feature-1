@@ -48,6 +48,10 @@ public class SecurityConfig {
                         .hasAnyRole("INGEST", "ADMIN")
                         // 冲突裁定：调度
                         .requestMatchers(HttpMethod.POST, "/api/commits/conflicts/**").hasAnyRole("DISPATCH", "ADMIN")
+                        // 语义编译：接入账号触发编译；调度/结算/管理员可查询
+                        .requestMatchers(HttpMethod.POST, "/api/semantic/compile", "/api/semantic/compile-all")
+                        .hasAnyRole("INGEST", "ADMIN")
+                        .requestMatchers("/api/semantic/**").hasAnyRole("DISPATCH", "SETTLEMENT", "ADMIN")
                         // 调度视图：调度
                         .requestMatchers("/api/dispatch/**").hasAnyRole("DISPATCH", "ADMIN")
                         // 清单冻结、修订裁定、对账、结算：结算账号

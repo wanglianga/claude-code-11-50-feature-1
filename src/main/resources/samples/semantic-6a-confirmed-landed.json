@@ -1,0 +1,5 @@
+[
+  {"sourceSystem": "CRANE", "sourceSeq": 161, "containerNo": "SEM008", "opPartition": "YARD-A", "eventType": "CRANE_MOVE", "bizTime": "2026-11-21T15:00:00+08:00", "voyageNo": "V2026-11B", "payload": {"action": "HOIST", "fromBlock": "STAGING", "fromSlot": "S8", "toBlock": "STAGING", "toSlot": "S8", "crane": "QC-06"}},
+  {"sourceSystem": "CRANE", "sourceSeq": 162, "containerNo": "SEM008", "opPartition": "YARD-A", "eventType": "CRANE_MOVE", "bizTime": "2026-11-21T15:05:00+08:00", "voyageNo": "V2026-11B", "payload": {"action": "TRAVEL", "fromBlock": "STAGING", "fromSlot": "S8", "toBlock": "A", "toSlot": "05-05", "crane": "QC-06"}},
+  {"sourceSystem": "CRANE", "sourceSeq": 163, "containerNo": "SEM008", "opPartition": "YARD-A", "eventType": "CRANE_MOVE", "bizTime": "2026-11-21T15:10:00+08:00", "voyageNo": "V2026-11B", "payload": {"action": "DROP", "fromBlock": "A", "fromSlot": "05-05", "toBlock": "A", "toSlot": "05-05", "crane": "QC-06"}}
+]

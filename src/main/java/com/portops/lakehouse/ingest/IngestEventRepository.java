@@ -41,4 +41,7 @@ public interface IngestEventRepository extends JpaRepository<IngestEvent, Long> 
     List<IngestEvent> findByCommitIdInOrderByBizTimeAscSourceSystemAscSourceSeqAsc(java.util.Collection<Long> commitIds);
 
     long countByContainerNoAndStatusAndBizTimeLessThanEqual(String containerNo, EventStatus status, OffsetDateTime cutoff);
+
+    @Query("select distinct e.containerNo from IngestEvent e where e.status = 'COMMITTED' order by e.containerNo")
+    List<String> findCommittedContainers();
 }

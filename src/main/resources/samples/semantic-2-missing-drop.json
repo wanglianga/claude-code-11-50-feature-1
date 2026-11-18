@@ -1,0 +1,4 @@
+[
+  {"sourceSystem": "CRANE", "sourceSeq": 111, "containerNo": "SEM002", "opPartition": "YARD-A", "eventType": "CRANE_MOVE", "bizTime": "2026-11-21T10:00:00+08:00", "voyageNo": "V2026-11B", "payload": {"action": "HOIST", "fromBlock": "A", "fromSlot": "02-02", "toBlock": "A", "toSlot": "02-02", "crane": "QC-02"}},
+  {"sourceSystem": "CRANE", "sourceSeq": 112, "containerNo": "SEM002", "opPartition": "YARD-A", "eventType": "CRANE_MOVE", "bizTime": "2026-11-21T10:05:00+08:00", "voyageNo": "V2026-11B", "payload": {"action": "TRAVEL", "fromBlock": "A", "fromSlot": "02-02", "toBlock": "A", "toSlot": "03-03", "crane": "QC-02", "note": "设备短暂离线，落下报文暂缺"}}
+]

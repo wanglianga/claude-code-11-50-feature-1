@@ -10,6 +10,7 @@ import com.portops.lakehouse.commit.LakeCommit;
 import com.portops.lakehouse.commit.LakeCommitRepository;
 import com.portops.lakehouse.ingest.IngestEvent;
 import com.portops.lakehouse.ingest.IngestEventRepository;
+import com.portops.lakehouse.semantic.SemanticQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +30,16 @@ public class DispatchService {
     private final IngestEventRepository eventRepo;
     private final LakeCommitRepository commitRepo;
     private final CommitConflictRepository conflictRepo;
+    private final SemanticQueryService semanticQueryService;
     private final ObjectMapper om;
 
     public DispatchService(IngestEventRepository eventRepo, LakeCommitRepository commitRepo,
-                           CommitConflictRepository conflictRepo, ObjectMapper om) {
+                           CommitConflictRepository conflictRepo,
+                           SemanticQueryService semanticQueryService, ObjectMapper om) {
         this.eventRepo = eventRepo;
         this.commitRepo = commitRepo;
         this.conflictRepo = conflictRepo;
+        this.semanticQueryService = semanticQueryService;
         this.om = om;
     }
 
@@ -59,6 +63,8 @@ public class DispatchService {
         r.put("uncommittedEventCount", uncommitted);
         r.put("pendingArbitrationCount", pendingArb);
         r.put("conflicts", conflictRepo.findByContainerNoOrderByCreatedAtAsc(containerNo));
+        // 语义层三层分区：当前可用（已证实）/ 推断状态（含置信等级与撤销规则）/ 待裁定范围
+        r.put("semanticView", semanticQueryService.containerView(containerNo));
         return r;
     }
 

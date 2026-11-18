@@ -1,0 +1,6 @@
+[
+  {"sourceSystem": "CRANE", "sourceSeq": 121, "containerNo": "SEM004", "opPartition": "YARD-B", "eventType": "CRANE_MOVE", "bizTime": "2026-11-21T11:00:00+08:00", "voyageNo": "V2026-11B", "payload": {"action": "HOIST", "fromBlock": "STAGING", "fromSlot": "S4", "toBlock": "STAGING", "toSlot": "S4", "crane": "QC-03"}},
+  {"sourceSystem": "CRANE", "sourceSeq": 122, "containerNo": "SEM004", "opPartition": "YARD-B", "eventType": "CRANE_MOVE", "bizTime": "2026-11-21T11:20:00+08:00", "voyageNo": "V2026-11B", "payload": {"action": "DROP", "fromBlock": "B", "fromSlot": "01-01", "toBlock": "B", "toSlot": "01-01", "crane": "QC-03"}},
+  {"sourceSystem": "CRANE", "sourceSeq": 131, "containerNo": "SEM005", "opPartition": "YARD-B", "eventType": "CRANE_MOVE", "bizTime": "2026-11-21T11:10:00+08:00", "voyageNo": "V2026-11B", "payload": {"action": "HOIST", "fromBlock": "STAGING", "fromSlot": "S5", "toBlock": "STAGING", "toSlot": "S5", "crane": "QC-03", "note": "QC-03 正在吊运 SEM004，不可能同时起吊 SEM005"}},
+  {"sourceSystem": "CRANE", "sourceSeq": 132, "containerNo": "SEM005", "opPartition": "YARD-B", "eventType": "CRANE_MOVE", "bizTime": "2026-11-21T11:15:00+08:00", "voyageNo": "V2026-11B", "payload": {"action": "DROP", "fromBlock": "B", "fromSlot": "02-02", "toBlock": "B", "toSlot": "02-02", "crane": "QC-03"}}
+]
